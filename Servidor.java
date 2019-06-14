@@ -43,6 +43,15 @@ class Servindo extends Thread {
 
   Servindo(Socket clientSocket) {
     this.clientSocket = clientSocket;
+    try {
+        os[cont] = new PrintStream(clientSocket.getOutputStream());
+        os[cont].println(cont);
+        os[cont].flush();
+        if(cont == 1) {
+          os[cont - 1].println("PODE COMECAR");
+          os[cont].println("PODE COMECAR");
+        }
+    } catch (IOException erro) {}
   }
 
   public void run() {
@@ -55,6 +64,7 @@ class Servindo extends Thread {
         inputLine = is.nextLine();
         System.out.println(inputLine);
         for (int i=0; i<cont; i++) {
+          System.out.println("CLIENTE " + i + " -> " + "Dados sendo enviados: " + inputLine);
           os[i].println(inputLine);
           os[i].flush();
         }
