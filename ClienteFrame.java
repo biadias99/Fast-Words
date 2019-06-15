@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.lang.*;
 
 public class ClienteFrame extends JFrame implements Runnable {
   static PrintStream os = null;
@@ -19,6 +20,8 @@ public class ClienteFrame extends JFrame implements Runnable {
   JLabel enemyLifesLabel = new JLabel("Remain lifes: " + enemyLifes);
   int cliente = -1;
   int enemy = -1;
+  String name = "-1";
+  String enemyName = "-1";
   int i = 2;
   String inputText;
   String canStart = "PODE COMECAR";
@@ -35,6 +38,10 @@ public class ClienteFrame extends JFrame implements Runnable {
     topDiv.add(leftDiv, BorderLayout.WEST);
     topDiv.add(rightDiv, BorderLayout.EAST);
     centerDiv.setBackground(Color.blue);
+    String palavra = "bianca";
+    JLabel wordLabel = new JLabel(palavra);
+    int tamanho = palavra.length();
+    centerDiv.add(wordLabel);
     add(topDiv, BorderLayout.NORTH);
     add(centerDiv, BorderLayout.CENTER);
     pack();
@@ -43,14 +50,46 @@ public class ClienteFrame extends JFrame implements Runnable {
     setVisible(true);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     addKeyListener(new KeyAdapter() {
+      int i = 0;
         public void keyPressed(KeyEvent e) {
-          System.out.println(e.getKeyCode());
-          inputText = "Codigo: " + e.getKeyCode() + " ";
-          os.println(inputText);
+          System.out.println("TECLA DIGITADA: " + e.getKeyChar() + "\n");
+          inputText = "Codigo: " + e.getKeyChar() + " ";
+
+          System.out.println("PALAVRA: " + palavra + "\n");
+          if(palavra.charAt(i) == e.getKeyChar()) {
+            wordLabel.setText(palavra.substring(i+1));
+            repaint();
+            System.out.println("NOVA PALAVRA: " + palavra.substring(i+1) + "\n");
+            i++;
+            if(i == tamanho) {
+              System.out.println("COMPLETOU A PALAVRAAA\n");
+              i = 0;
+            }
+          } else {
+            wordLabel.setText(palavra);
+            i = 0;
+          }
+          os.println(cliente + " " + e.getKeyChar());
           // inputText = new String("Henrique" + " ");
           // os.println(inputText);
         }
     });
+
+    new Thread(new Runnable() {
+      public void run() {
+        try {
+          do {
+            System.out.println("nome: " + name + " inimigo: " + enemyName + "\n" + (name.compareTo("-1") != 0) + (enemyName.compareTo("-1") != 0));
+            if(name.compareTo("-1") != 0 && enemyName.compareTo("-1") != 0) {
+              System.out.println("ENTROU NO IF");
+              Thread.sleep(1000);
+            }
+          } while(true);
+        } catch(InterruptedException ex) {
+
+        }
+      }
+    }).start();
   }
 
   public static void main(String[] args) {
@@ -73,8 +112,6 @@ public class ClienteFrame extends JFrame implements Runnable {
 
     try {
       String inputLine;
-      String name;
-      String enemyName;
 
       if(cliente < 0) {
         String clienteNumber = is.nextLine();
@@ -85,16 +122,20 @@ public class ClienteFrame extends JFrame implements Runnable {
         else enemy = 1;
         System.out.println("CLIENTE: " + cliente + "ENEMY: " + enemy);
       }
-      // name = JOptionPane.showInputDialog(null, "Qual o seu nome?", "Digite seu nome", JOptionPane.QUESTION_MESSAGE);
-      // os.println(name);
-      // nameLabel.setText(name);
       String canStartFromServer = is.nextLine();
-      System.out.println("segundo os -> " + canStartFromServer); 
 
+      if(canStartFromServer.compareTo(canStart) == 0) {
+        System.out.println("PODE COMECARRRR");
+        name = JOptionPane.showInputDialog(null, "Qual o seu nome?", "Digite seu nome", JOptionPane.QUESTION_MESSAGE);
+        if(name.compareTo("-1") != 0) os.println(cliente + " " + name);
+        enemyName = is.nextLine();
+        nameLabel.setText(name);
+        enemyNameLabel.setText(enemyName);
       do {
-        System.out.println("os numero " + i + (inputLine=is.nextLine())+"\n");
+        System.out.println("OS de numero " + i + (inputLine=is.nextLine())+"\n");
         i++;
       } while (!inputLine.equals(""));
+    }
 
       os.close();
       is.close();

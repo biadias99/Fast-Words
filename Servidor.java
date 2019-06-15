@@ -1,6 +1,7 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.lang.*;
 
 class Servidor {
   public static void main(String[] args) {
@@ -40,6 +41,8 @@ class Servindo extends Thread {
   Socket clientSocket;
   static PrintStream os[] = new PrintStream[3];
   static int cont=0;
+  static int gettingNames = 0;
+  static String names[] = new String[2];
 
   Servindo(Socket clientSocket) {
     this.clientSocket = clientSocket;
@@ -59,16 +62,33 @@ class Servindo extends Thread {
       Scanner is = new Scanner(clientSocket.getInputStream());
       os[cont++] = new PrintStream(clientSocket.getOutputStream());
       String inputLine, outputLine;
+      String data[] = new String[2];
+      int cliente;
 
-      do {
-        inputLine = is.nextLine();
-        System.out.println(inputLine);
-        for (int i=0; i<cont; i++) {
-          System.out.println("CLIENTE " + i + " -> " + "Dados sendo enviados: " + inputLine);
-          os[i].println(inputLine);
-          os[i].flush();
-        }
-      } while (!inputLine.equals(""));
+      if(gettingNames < 2) {
+        System.out.println("ENTROU GETTING NAMES\n");
+        data = is.nextLine().split(" ");
+        cliente = Integer.parseInt(data[0]);
+
+        names[cliente] = data[1];
+        gettingNames++;
+      }
+
+      System.out.println("NOMES:   " + names[0] + " --- " + names[1] + " GETTING NAMES: " + gettingNames + "\n");
+      if(gettingNames == 2) {
+        os[0].println(names[1]);
+        os[1].println(names[0]);
+        gettingNames++;
+      }
+        do {
+          inputLine = is.nextLine();
+          System.out.println("\nDADOS RECEBIDOS: " + inputLine);
+          for (int i=0; i<cont; i++) {
+            System.out.println("CLIENTE " + i + " -> " + "Dados sendo enviados: " + inputLine);
+            os[i].println(inputLine);
+            os[i].flush();
+          }
+        } while (!inputLine.equals(""));
 
       for (int i=0; i<cont; i++)
         os[i].close();
