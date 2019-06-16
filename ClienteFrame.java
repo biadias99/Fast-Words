@@ -37,7 +37,7 @@ public class ClienteFrame extends JFrame implements Runnable {
   String inputText;
   String canStart = "PODE COMECAR";
   char teclaDigitada;
-  int speed = 600;
+  int speed = 300;
   String canStartFromServer;
   JLabel waitingEnemy = new JLabel("Waiting enemy...");
   static int lifeThread = 1;
@@ -191,39 +191,39 @@ public class ClienteFrame extends JFrame implements Runnable {
                 System.out.println("LIFE THREAD == 0, 1\n");
                 lifeThread = 0;
                 centerDiv.removeAll();
-          
+
                 waitingEnemy.setText("YOU LOSE!");
                 waitingEnemy.setSize(300, 80);
                 waitingEnemy.setFont(new Font("Arial", Font.BOLD, 50));
                 waitingEnemy.setLocation(400, 25);
                 centerDiv.add(waitingEnemy);
-          
+
                 revalidate();
                 repaint();
               } else if (selfLifes != 0 && enemyLifes == 0) {
                 System.out.println("LIFE THREAD == 0, 2\n");
                 lifeThread = 0;
                 centerDiv.removeAll();
-          
+
                 waitingEnemy.setText("YOU WIN!");
                 waitingEnemy.setSize(300, 80);
                 waitingEnemy.setFont(new Font("Arial", Font.BOLD, 50));
                 waitingEnemy.setLocation(400, 25);
                 centerDiv.add(waitingEnemy);
-          
+
                 revalidate();
                 repaint();
               } else if (selfLifes == 0 && enemyLifes == 0) {
                 System.out.println("LIFE THREAD == 0, 3\n");
                 lifeThread = 0;
                 centerDiv.removeAll();
-          
+
                 waitingEnemy.setText("DRAW!");
                 waitingEnemy.setSize(300, 80);
                 waitingEnemy.setFont(new Font("Arial", Font.BOLD, 50));
                 waitingEnemy.setLocation(400, 25);
                 centerDiv.add(waitingEnemy);
-          
+
                 revalidate();
                 repaint();
               }
@@ -247,7 +247,7 @@ public class ClienteFrame extends JFrame implements Runnable {
       }
     }).start();
   }
-  
+
   public boolean wordExists(String word) {
     for (int i = 0; i < 3; i++) {
       if (lostWords[i].equals(word)) {
