@@ -158,7 +158,7 @@ public class ClienteFrame extends JFrame implements Runnable {
                   if (speed <= 0)
                     speed = 100;
                 }
-                Thread.sleep(5000); // 35 segundos com 10 palavras
+                Thread.sleep(3500); // 35 segundos com 10 palavras
               }
               // Thread.sleep(12000); //12 segundos
             }
