@@ -109,6 +109,11 @@ class Servindo extends Thread {
           int index = Integer.parseInt(dados[4]);
           int lifes = Integer.parseInt(dados[5]);
           if(posY > 790 && lifes >= 0) lifes--;
+
+          try {
+            Thread.sleep(50);
+          } catch(InterruptedException ie) { }
+          
           if(clienteReceived == 0) {
             os[1].println(word + " " + posX + " " + posY + " " + index + " " + lifes);
             os[1].flush();

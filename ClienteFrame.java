@@ -38,6 +38,7 @@ public class ClienteFrame extends JFrame implements Runnable {
   char teclaDigitada;
   int speed = 600;
   String canStartFromServer;
+  JLabel waitingEnemy = new JLabel("Waiting enemy...");
 
   ClienteFrame() {
     super("Fast Words");
@@ -51,6 +52,12 @@ public class ClienteFrame extends JFrame implements Runnable {
     topDiv.add(leftDiv, BorderLayout.WEST);
     topDiv.add(rightDiv, BorderLayout.EAST);
     centerDiv.setBackground(new Color(207, 219, 213));
+
+    waitingEnemy.setSize(200, 20);
+    waitingEnemy.setFont(new Font("Arial", Font.PLAIN, 20));
+    waitingEnemy.setLocation(400, 25);
+    centerDiv.add(waitingEnemy);
+
     add(topDiv, BorderLayout.NORTH);
     add(centerDiv, BorderLayout.CENTER);
     setPreferredSize(new Dimension(1000, 800));
@@ -59,6 +66,20 @@ public class ClienteFrame extends JFrame implements Runnable {
     setLocationRelativeTo(null); // alinhar o JFrame ao centro
     setVisible(true);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+    // Setando o tamanho das labels do menu
+    selfLifesLabel.setSize(200, 20);
+    selfLifesLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+
+    enemyLifesLabel.setSize(200, 20);
+    enemyLifesLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+
+    nameLabel.setSize(200, 20);
+    nameLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+
+    enemyNameLabel.setSize(200, 20);
+    enemyNameLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+
     addKeyListener(new KeyAdapter() {
         public void keyPressed(KeyEvent e) {
           if(name.compareTo("-1") != 0 && enemyName.compareTo("-1") != 0) {
@@ -104,6 +125,7 @@ public class ClienteFrame extends JFrame implements Runnable {
               //   System.out.println("CONTADOR: " + contTest + "\n");
               // }
               // System.out.println("INICIOU getDownWords\n");
+              waitingEnemy.setText("");
               while(words.hasNext()) {
                 // System.out.println("ENTROU NO IF ->" + randomXAxis[i]);
                 String word = words.next().toString();
@@ -221,9 +243,14 @@ public class ClienteFrame extends JFrame implements Runnable {
       }
       canStartFromServer = is.nextLine();
 
-      if(canStartFromServer.compareTo(canStart) == 0) {
-        System.out.println("PODE COMECARRRR");
+      if(canStartFromServer.compareTo(canStart) == 0) {    
         name = JOptionPane.showInputDialog(null, "Qual o seu nome?", "Digite seu nome", JOptionPane.QUESTION_MESSAGE);
+
+        if (name == null || name.compareTo("-1") == 0 || name.equals("")) {
+          int numero = cliente + 1;
+          name = "Jogador" + numero;
+        }
+
         if(name.compareTo("-1") != 0) os.println(cliente + " " + name);
         enemyName = is.nextLine();
         nameLabel.setText(name);
