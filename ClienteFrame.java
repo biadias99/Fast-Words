@@ -125,9 +125,9 @@ public class ClienteFrame extends JFrame implements Runnable {
                 wordsCount++;
                 if(wordsCount % 10 == 0) {
                   speed -= 100;
-                  if(speed <= 0) speed = 50;
+                  if(speed <= 0) speed = 100;
                 }
-                Thread.sleep(3500); //35 segundos com 10 palavras
+                Thread.sleep(5000); //35 segundos com 10 palavras
               }
               // Thread.sleep(12000); //12 segundos
             }
@@ -198,7 +198,7 @@ public class ClienteFrame extends JFrame implements Runnable {
     Scanner is = null;
 
     try {
-      socket = new Socket("192.168.42.81", 80);
+      socket = new Socket("192.168.0.8", 80);
       os = new PrintStream(socket.getOutputStream(), true);
       is = new Scanner(socket.getInputStream());
     } catch (UnknownHostException e) {
