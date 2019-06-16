@@ -147,8 +147,7 @@ public class ClienteFrame extends JFrame implements Runnable {
                 // wordLabel[i].setBackground(Color.red);
                 centerDiv.add(wordLabel[i]);
 
-                // pos[i] = 0; LEMBRAR DE TROCAR SEUS MANÉS
-                pos[i] = 600;
+                pos[i] = 0;
                 wordLabel[i].setLocation(randomXAxis[i], pos[i]);
                 // System.out.println("wordLabel[" + i + "]: " + wordLabel[i].getText() + "\n");
                 // repaint();
