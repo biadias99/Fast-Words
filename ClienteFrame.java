@@ -10,13 +10,15 @@ import java.text.Collator;
 
 public class ClienteFrame extends JFrame implements Runnable {
   static PrintStream os = null;
+
   JPanel topDiv = new JPanel(new BorderLayout());
-  JPanel centerDiv = new JPanel();
+  JPanel centerDiv = new JPanel(null);
   JPanel leftDiv = new JPanel(new GridLayout(2, 1));
   JPanel rightDiv = new JPanel(new GridLayout(2, 1));
   JLabel nameLabel = new JLabel("No name");
   JLabel enemyNameLabel = new JLabel("Enemy name");
   JLabel wordLabel[] = new JLabel[100];
+  JLabel enemyWordLabel[] = new JLabel[100];
   int randomXAxis[] = new int[100];
   String prevWords[] = new String[100];
   RandomWords rw = new RandomWords();
@@ -34,6 +36,8 @@ public class ClienteFrame extends JFrame implements Runnable {
   String inputText;
   String canStart = "PODE COMECAR";
   char teclaDigitada;
+  int speed = 600;
+  String canStartFromServer;
 
   ClienteFrame() {
     super("Fast Words");
@@ -41,40 +45,44 @@ public class ClienteFrame extends JFrame implements Runnable {
     leftDiv.add(selfLifesLabel);
     rightDiv.add(enemyNameLabel);
     rightDiv.add(enemyLifesLabel);
-    topDiv.setBackground(Color.green);
-    leftDiv.setBackground(Color.green);
-    rightDiv.setBackground(Color.green);
+    topDiv.setBackground(new Color(184, 242, 230));
+    leftDiv.setBackground(new Color(184, 242, 230));
+    rightDiv.setBackground(new Color(184, 242, 230));
     topDiv.add(leftDiv, BorderLayout.WEST);
     topDiv.add(rightDiv, BorderLayout.EAST);
-    centerDiv.setBackground(Color.blue);
+    centerDiv.setBackground(new Color(207, 219, 213));
     add(topDiv, BorderLayout.NORTH);
     add(centerDiv, BorderLayout.CENTER);
-    setPreferredSize(new Dimension(1500, 900));
+    setPreferredSize(new Dimension(1000, 800));
     setResizable(false);
     pack();
     setLocationRelativeTo(null); // alinhar o JFrame ao centro
     setVisible(true);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     addKeyListener(new KeyAdapter() {
-      int i = 0;
         public void keyPressed(KeyEvent e) {
-          // System.out.println("TECLA DIGITADA: " + e.getKeyChar() + "\n");
-          // inputText = "Codigo: " + e.getKeyChar() + " ";
-          teclaDigitada = e.getKeyChar();
-          os.println(cliente + " " + e.getKeyChar());
-          while(wordLabel[wordCont] != null) {
-            String word = wordLabel[wordCont].getText();
-            System.out.println("PREV WORD AND WORD in label -->>" + prevWords[wordCont] + "   " + word + "\n");
-            if(word != "") { // está verificando todas as palavras, ou seja, se várias começarem com "a", vai apagar o "a" de todas
-                verifyWord(word, wordCont);
-              }
-            wordCont++;
+          if(name.compareTo("-1") != 0 && enemyName.compareTo("-1") != 0) {
+            // System.out.println("TECLA DIGITADA: " + e.getKeyChar() + "\n");
+            // inputText = "Codigo: " + e.getKeyChar() + " ";
+            teclaDigitada = e.getKeyChar();
+            // os.println(cliente + " " + e.getKeyChar());
+            while(wordLabel[wordCont] != null) {
+              String word = wordLabel[wordCont].getText();
+              // System.out.println("PREV WORD AND WORD in label -->>" + prevWords[wordCont] + "   " + word + "\n");
+              if(word != "") { // está verificando todas as palavras, ou seja, se várias começarem com "a", vai apagar o "a" de todas
+                  verifyWord(word, wordCont);
+                }
+              wordCont++;
+            }
+            wordCont = 0;
+            // inputText = new String("Henrique" + " ");
+            // os.println(inputText);
           }
-          wordCont = 0;
-          // inputText = new String("Henrique" + " ");
-          // os.println(inputText);
         }
     });
+
+    for(int i = 0; i < 100; i++)
+      enemyWordLabel[i] = new JLabel();
 
     new Thread(new Runnable() {
       public void run() {
@@ -82,69 +90,95 @@ public class ClienteFrame extends JFrame implements Runnable {
           do {
             // System.out.println("nome: " + name + " inimigo: " + enemyName + "\n" + (name.compareTo("-1") != 0) + (enemyName.compareTo("-1") != 0));
             if(name.compareTo("-1") != 0 && enemyName.compareTo("-1") != 0) {
-              List<String> list = rw.createList(10);
-              Collections.sort(list, Collator.getInstance());
-              Iterator<String> words = list.iterator();
-              getDownWords.start();
-              // System.out.println("INICIOU getDownWords\n");
+              int wordsCount = 0;
+              // int contTest = 0;
               int i = 0;
-                while(words.hasNext()) {
-                  randomXAxis[i] = getRandomXAxis(0, 1450);
-                  // System.out.println("ENTROU NO IF ->" + randomXAxis[i]);
-                  String word = words.next().toString();
-                  prevWords[i] = word;
-                  int tamanho = word.length();
-                  // System.out.println("RandomWord string: " + word + " tamanho: " + tamanho + "\n");
-                  wordLabel[i] = new JLabel(word);
-                  wordLabel[i].setSize(100, 10);
-                  wordLabel[i].setBackground(Color.red);
-                  centerDiv.add(wordLabel[i]);
-                  pos[i] = 0;
-                  wordLabel[i].setLocation(randomXAxis[i], pos[i]);
-                  // System.out.println("wordLabel[" + i + "]: " + wordLabel[i].getText() + "\n");
-                  //repaint();
-                  i++;
-                  Thread.sleep(3500);
+              List<String> list = rw.createList(100);
+              // Collections.sort(list, Collator.getInstance());
+              Iterator<String> words = list.iterator();
+              // Iterator<String> wordsToSend = list.iterator();
+              // while(wordsToSend.hasNext()) {
+              //   String wordToSend = wordsToSend.next().toString();
+              //   os.println(cliente + " " + wordToSend);
+              //   contTest++;
+              //   System.out.println("CONTADOR: " + contTest + "\n");
+              // }
+              // System.out.println("INICIOU getDownWords\n");
+              while(words.hasNext()) {
+                // System.out.println("ENTROU NO IF ->" + randomXAxis[i]);
+                String word = words.next().toString();
+                prevWords[i] = word;
+                randomXAxis[i] = getRandomXAxis(0, 700);
+
+                wordLabel[i] = new JLabel(word);
+                wordLabel[i].setSize(200, 20);
+                wordLabel[i].setFont(new Font("Arial", Font.PLAIN, 20));
+
+                // wordLabel[i].setBackground(Color.red);
+                centerDiv.add(wordLabel[i]);
+
+                pos[i] = 0;
+                wordLabel[i].setLocation(randomXAxis[i], pos[i]);
+                // System.out.println("wordLabel[" + i + "]: " + wordLabel[i].getText() + "\n");
+                //repaint();
+                i++;
+                wordsCount++;
+                if(wordsCount % 10 == 0) {
+                  speed -= 100;
+                  if(speed <= 0) speed = 50;
                 }
-              Thread.sleep(200000);
+                Thread.sleep(3500); //35 segundos com 10 palavras
+              }
+              // Thread.sleep(12000); //12 segundos
             }
             Thread.sleep(1000);
           } while(true);
-        } catch(InterruptedException ex) {}
+        } catch(InterruptedException ex) {
+          System.err.println("Erro no run das palavras -> " + ex);
+        }
+      }
+    }).start();
+
+    new Thread(new Runnable() {
+      int cont = 0;
+      public void run() {
+        try {
+          do {
+            while(wordLabel[cont] != null) {
+              pos[cont] += 5;
+              // cliente palavra x y
+              os.println(cliente + " " + wordLabel[cont].getText() + " " + randomXAxis[cont] + " " + pos[cont] + " " + cont + " " + selfLifes);
+              // System.out.println("LABEL[" + cont + "]: " + wordLabel[cont].getText() + "\n");
+              wordLabel[cont].setLocation(randomXAxis[cont], pos[cont]);
+              if(pos[cont] > 790) {
+                selfLifes--;
+                if(selfLifes == 0) System.out.println("PERDEU SUAS VIDAS!");
+                selfLifesLabel.setText("Remain lifes: " + selfLifes);
+              }
+              cont++;
+              // System.out.println("count: " + cont + "\n");
+            }
+            cont = 0;
+            Thread.sleep(speed);
+          } while(true);
+        }catch(InterruptedException ex) {
+          System.err.println("Erro no run do cont -> " + ex);
+        }
       }
     }).start();
   }
 
-  Thread getDownWords = new Thread(new Runnable() {
-    int cont = 0;
-    public void run() {
-      try {
-        do {
-          while(wordLabel[cont] != null) {
-            pos[cont] += 5;
-            // System.out.println("LABEL[" + cont + "]: " + wordLabel[cont].getText() + "\n");
-            wordLabel[cont].setLocation(randomXAxis[cont], pos[cont]);
-            cont++;
-            // System.out.println("count: " + cont + "\n");
-          }
-          cont = 0;
-          Thread.sleep(200);
-        } while(true);
-      }catch(InterruptedException ex) {}
-    }
-  });
-
   public void verifyWord(String word, int index) {
-    System.out.println("PALAVRA: " + word + "\n");
+    // System.out.println("PALAVRA: " + word + "\n");
     int tamanho = word.length();
-    if(tamanho == 0) {
-      System.out.println("COMPLETOU A PALAVRAAA\n");
-      wordLabel[index].setText("");
-    }
+    // if(tamanho == 0) {
+    //   System.out.println("COMPLETOU A PALAVRAAA\n");
+    //   wordLabel[index].setText("");
+    // }
     if(word.charAt(0) == teclaDigitada) {
       if(tamanho == 1) wordLabel[index].setText("");
       else wordLabel[index].setText(word.substring(1));
-      System.out.println("NOVA PALAVRA: " + word.substring(1) + "\n");
+      // System.out.println("NOVA PALAVRA: " + word.substring(1) + "\n");
     } else {
       wordLabel[index].setText(prevWords[index]);
       i = 0;
@@ -185,7 +219,7 @@ public class ClienteFrame extends JFrame implements Runnable {
         else enemy = 1;
         System.out.println("CLIENTE: " + cliente + "ENEMY: " + enemy);
       }
-      String canStartFromServer = is.nextLine();
+      canStartFromServer = is.nextLine();
 
       if(canStartFromServer.compareTo(canStart) == 0) {
         System.out.println("PODE COMECARRRR");
@@ -195,7 +229,22 @@ public class ClienteFrame extends JFrame implements Runnable {
         nameLabel.setText(name);
         enemyNameLabel.setText(enemyName);
       do {
-        System.out.println("OS de numero " + i + ": " + (inputLine=is.nextLine())+"\n");
+        inputLine=is.nextLine();
+        System.out.println("IS de numero " + i + ": " + (inputLine)+"\n");
+        String enemyData[] = new String[5];
+
+        enemyData = inputLine.split(" ");
+        for(int i = 0; i < 5; i++)
+          System.out.println("enemyData[" + i + "]: " + enemyData[i] + "\n");
+        System.out.println("enemyWordLabel ->> " + enemyWordLabel[0]);
+        int enemyCont = Integer.parseInt(enemyData[3]);
+        enemyWordLabel[enemyCont].setText(enemyData[0]);
+        enemyWordLabel[enemyCont].setLocation(Integer.parseInt(enemyData[1]), Integer.parseInt(enemyData[2]));
+        enemyWordLabel[enemyCont].setSize(200, 20);
+        enemyWordLabel[enemyCont].setForeground(new Color(158, 160, 158));
+        enemyWordLabel[enemyCont].setFont(new Font("Arial", Font.PLAIN, 20));
+        enemyLifesLabel.setText("Remain lifes: " + enemyData[4]);
+        centerDiv.add(enemyWordLabel[enemyCont]);
         i++;
       } while (!inputLine.equals(""));
     }
