@@ -5,7 +5,7 @@ import java.lang.*;
 
 class Servidor {
   public static void main(String[] args) {
-    ServerSocket serverSocket=null;
+    ServerSocket serverSocket = null;
 
     try {
       serverSocket = new ServerSocket(80);
@@ -14,7 +14,7 @@ class Servidor {
       System.exit(1);
     }
 
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
       Socket clientSocket = null;
       try {
         clientSocket = serverSocket.accept();
@@ -36,26 +36,36 @@ class Servidor {
   }
 }
 
-
 class Servindo extends Thread {
   Socket clientSocket;
   static PrintStream os[] = new PrintStream[3];
-  static int cont=0;
+  static int cont = 0;
   static int gettingNames = 0;
   static int gettingLists = 0;
   static String names[] = new String[2];
+  static int lifeThread = 1;
 
   Servindo(Socket clientSocket) {
     this.clientSocket = clientSocket;
     try {
-        os[cont] = new PrintStream(clientSocket.getOutputStream());
-        os[cont].println(cont);
-        os[cont].flush();
-        if(cont == 1) {
-          os[cont - 1].println("PODE COMECAR");
-          os[cont].println("PODE COMECAR");
-        }
-    } catch (IOException erro) {}
+      os[cont] = new PrintStream(clientSocket.getOutputStream());
+      os[cont].println(cont);
+      os[cont].flush();
+      if (cont == 1) {
+        os[cont - 1].println("PODE COMECAR");
+        os[cont].println("PODE COMECAR");
+      }
+    } catch (IOException erro) {
+    }
+  }
+
+  public boolean wordExists(String lostWords[], String word) {
+    for (int i = 0; i < 3; i++) {
+      if (lostWords[i].equals(word)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public void run() {
@@ -63,15 +73,23 @@ class Servindo extends Thread {
       Scanner is = new Scanner(clientSocket.getInputStream());
       os[cont++] = new PrintStream(clientSocket.getOutputStream());
       String inputLine, outputLine;
-      String  gettingWords[] = new String[2];
+      String gettingWords[] = new String[2];
       String data[] = new String[2];
       String dados[] = new String[6];
+      String lostWords0[] = new String[3];
+      int contLostWords0 = 0;
+      String lostWords1[] = new String[3];
+      int contLostWords1 = 0;
+      for (int i = 0; i < 3; i++) {
+        lostWords0[i] = "";
+        lostWords1[i] = "";
+      }
       // List<String> listReceived0 = new ArrayList<String>();
       // List<String> listReceived1 = new ArrayList<String>();
       int cliente;
       // int clienteList;
 
-      if(gettingNames < 2) {
+      if (gettingNames < 2) {
         System.out.println("ENTROU GETTING NAMES\n");
         data = is.nextLine().split(" ");
         cliente = Integer.parseInt(data[0]);
@@ -81,49 +99,62 @@ class Servindo extends Thread {
       }
 
       System.out.println("NOMES:   " + names[0] + " --- " + names[1] + " GETTING NAMES: " + gettingNames + "\n");
-      if(gettingNames == 2) {
+      if (gettingNames == 2) {
         os[0].println(names[1]);
         os[1].println(names[0]);
         gettingNames++;
       }
       // if(gettingLists < 2) {
-      //   int i = 0;
-      //   while(is.hasNext()) {
-      //     gettingWords = is.nextLine().split(" ");
-      //     clienteList = Integer.parseInt(gettingWords[0]);
-      //     if(clienteList == 0) listReceived0.add(gettingWords[1]);
-      //     else if(clienteList == 1) listReceived1.add(gettingWords[1]);
-      //     System.out.println(" CLIENTE[" + gettingWords[0] + "]: " + gettingWords[1] + "contador" + i++ +"\n");
-      //   }
-      //   gettingLists++;
+      // int i = 0;
+      // while(is.hasNext()) {
+      // gettingWords = is.nextLine().split(" ");
+      // clienteList = Integer.parseInt(gettingWords[0]);
+      // if(clienteList == 0) listReceived0.add(gettingWords[1]);
+      // else if(clienteList == 1) listReceived1.add(gettingWords[1]);
+      // System.out.println(" CLIENTE[" + gettingWords[0] + "]: " + gettingWords[1] +
+      // "contador" + i++ +"\n");
       // }
+      // gettingLists++;
+      // }
+      do {
+        inputLine = is.nextLine();
+        // System.out.println("Servidor -> " + inputLine);
+        dados = inputLine.split(" ");
+        int clienteReceived = Integer.parseInt(dados[0]);
+        String word = dados[1];
+        int posX = Integer.parseInt(dados[2]);
+        int posY = Integer.parseInt(dados[3]);
+        int index = Integer.parseInt(dados[4]);
+        int lifes = Integer.parseInt(dados[5]);
 
-        do {
-          inputLine = is.nextLine();
-          System.out.println("Servidor -> " + inputLine);
-          dados = inputLine.split(" ");
-          int clienteReceived = Integer.parseInt(dados[0]);
-          String word = dados[1];
-          int posX = Integer.parseInt(dados[2]);
-          int posY = Integer.parseInt(dados[3]);
-          int index = Integer.parseInt(dados[4]);
-          int lifes = Integer.parseInt(dados[5]);
-          if(posY > 790 && lifes >= 0) lifes--;
-
-          try {
-            Thread.sleep(50);
-          } catch(InterruptedException ie) { }
-          
-          if(clienteReceived == 0) {
-            os[1].println(word + " " + posX + " " + posY + " " + index + " " + lifes);
-            os[1].flush();
-          } else if (clienteReceived == 1) {
-            os[0].println(word + " " + posX + " " + posY + " " + index + " " + lifes);
-            os[0].flush();
+        if (clienteReceived == 0) {
+          if (posY > 790 && lifes >= 0 && !word.equals("") && !wordExists(lostWords0, word)) {
+            System.out.println("ENTROU LIFE CLIENTE 0" + word + " cont: " + contLostWords0);
+            lostWords0[contLostWords0] = word;
+            contLostWords0++;
+            lifes--;
+            if (lifes == 0) {
+              lifeThread = 0;
+            }
           }
-        } while (!inputLine.equals(""));
+          os[1].println(word + " " + posX + " " + posY + " " + index + " " + lifes);
+          os[1].flush();
+        } else if (clienteReceived == 1) {
+          if (posY > 790 && lifes >= 0 && !word.equals("") && !wordExists(lostWords1, word)) {
+            System.out.println("ENTROU LIFE CLIENTE 0" + word + " cont: " + contLostWords1);
+            lostWords1[contLostWords1] = word;
+            contLostWords1++;
+            lifes--;
+            if (lifes == 0) {
+              lifeThread = 0;
+            }
+          }
+          os[0].println(word + " " + posX + " " + posY + " " + index + " " + lifes);
+          os[0].flush();
+        }
+      } while (!inputLine.equals("") && lifeThread == 1);
 
-      for (int i=0; i<cont; i++)
+      for (int i = 0; i < cont; i++)
         os[i].close();
       is.close();
       clientSocket.close();
