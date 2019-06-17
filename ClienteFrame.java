@@ -7,12 +7,39 @@ import java.util.*;
 import java.util.List;
 import java.lang.*;
 import java.text.Collator;
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
+
+class ImagePanel extends JPanel {
+
+  private Image img;
+
+  // public ImagePanel(String img) {
+  //   this(new ImageIcon(img).getImage());
+  // }
+
+  public ImagePanel(Image img) {
+    this.img = img;
+    Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
+    setPreferredSize(size);
+    setMinimumSize(size);
+    setMaximumSize(size);
+    setSize(size);
+    setLayout(null);
+  }
+
+  public void paintComponent(Graphics g) {
+    g.drawImage(img, 0, 0, null);
+  }
+
+}
 
 public class ClienteFrame extends JFrame implements Runnable {
   static PrintStream os = null;
 
   JPanel topDiv = new JPanel(new BorderLayout());
   JPanel centerDiv = new JPanel(null);
+
   JPanel leftDiv = new JPanel(new GridLayout(2, 1));
   JPanel rightDiv = new JPanel(new GridLayout(2, 1));
   JLabel nameLabel = new JLabel("No name");
@@ -44,20 +71,23 @@ public class ClienteFrame extends JFrame implements Runnable {
 
   ClienteFrame() {
     super("Fast Words");
+    centerDiv = new ImagePanel(new ImageIcon("fundo.jpeg").getImage());
     leftDiv.add(nameLabel);
     leftDiv.add(selfLifesLabel);
     rightDiv.add(enemyNameLabel);
     rightDiv.add(enemyLifesLabel);
-    topDiv.setBackground(new Color(184, 242, 230));
-    leftDiv.setBackground(new Color(184, 242, 230));
-    rightDiv.setBackground(new Color(184, 242, 230));
+    topDiv.setBackground(new Color(0, 0, 0));
+    leftDiv.setBackground(new Color(0, 0, 0));
+    rightDiv.setBackground(new Color(0, 0, 0));
     topDiv.add(leftDiv, BorderLayout.WEST);
     topDiv.add(rightDiv, BorderLayout.EAST);
     centerDiv.setBackground(new Color(207, 219, 213));
 
-    waitingEnemy.setSize(200, 30);
-    waitingEnemy.setFont(new Font("Arial", Font.PLAIN, 20));
+    waitingEnemy.setSize(200, 80);
+    waitingEnemy.setFont(new Font("Arial", Font.BOLD, 20));
     waitingEnemy.setLocation(400, 25);
+    waitingEnemy.setForeground(new Color(255, 255, 255));
+    
     centerDiv.add(waitingEnemy);
 
     add(topDiv, BorderLayout.NORTH);
@@ -75,15 +105,19 @@ public class ClienteFrame extends JFrame implements Runnable {
     // Setando o tamanho das labels do menu
     selfLifesLabel.setSize(200, 20);
     selfLifesLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+    selfLifesLabel.setForeground(new Color(255, 255, 255));
 
     enemyLifesLabel.setSize(200, 20);
     enemyLifesLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+    enemyLifesLabel.setForeground(new Color(255, 255, 255));
 
     nameLabel.setSize(200, 20);
     nameLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+    nameLabel.setForeground(new Color(255, 255, 255));
 
     enemyNameLabel.setSize(200, 20);
     enemyNameLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+    enemyNameLabel.setForeground(new Color(255, 255, 255));
 
     addKeyListener(new KeyAdapter() {
       public void keyPressed(KeyEvent e) {
@@ -141,14 +175,16 @@ public class ClienteFrame extends JFrame implements Runnable {
                 randomXAxis[i] = getRandomXAxis(0, 700);
 
                 wordLabel[i] = new JLabel(word);
-                wordLabel[i].setSize(200, 20);
-                wordLabel[i].setFont(new Font("Arial", Font.PLAIN, 20));
+                wordLabel[i].setSize(200, 50);
+                wordLabel[i].setFont(new Font("Arial", Font.BOLD, 25));
+                wordLabel[i].setForeground(new Color(255, 255, 255));
 
                 // wordLabel[i].setBackground(Color.red);
                 centerDiv.add(wordLabel[i]);
 
                 pos[i] = 0;
                 wordLabel[i].setLocation(randomXAxis[i], pos[i]);
+                
                 // System.out.println("wordLabel[" + i + "]: " + wordLabel[i].getText() + "\n");
                 // repaint();
                 i++;
@@ -196,6 +232,8 @@ public class ClienteFrame extends JFrame implements Runnable {
                 waitingEnemy.setSize(300, 80);
                 waitingEnemy.setFont(new Font("Arial", Font.BOLD, 50));
                 waitingEnemy.setLocation(400, 25);
+                waitingEnemy.setForeground(new Color(255, 255, 255));
+
                 centerDiv.add(waitingEnemy);
 
                 revalidate();
@@ -209,6 +247,8 @@ public class ClienteFrame extends JFrame implements Runnable {
                 waitingEnemy.setSize(300, 80);
                 waitingEnemy.setFont(new Font("Arial", Font.BOLD, 50));
                 waitingEnemy.setLocation(400, 25);
+                waitingEnemy.setForeground(new Color(255, 255, 255));
+
                 centerDiv.add(waitingEnemy);
 
                 revalidate();
@@ -222,6 +262,8 @@ public class ClienteFrame extends JFrame implements Runnable {
                 waitingEnemy.setSize(300, 80);
                 waitingEnemy.setFont(new Font("Arial", Font.BOLD, 50));
                 waitingEnemy.setLocation(400, 25);
+                waitingEnemy.setForeground(new Color(255, 255, 255));
+
                 centerDiv.add(waitingEnemy);
 
                 revalidate();
@@ -290,7 +332,7 @@ public class ClienteFrame extends JFrame implements Runnable {
     Scanner is = null;
 
     try {
-      socket = new Socket("192.168.0.8", 80);
+      socket = new Socket("186.217.119.110", 8383);
       os = new PrintStream(socket.getOutputStream(), true);
       is = new Scanner(socket.getInputStream());
     } catch (UnknownHostException e) {
@@ -339,9 +381,9 @@ public class ClienteFrame extends JFrame implements Runnable {
           enemyLifes = Integer.parseInt(enemyData[4]);
           enemyWordLabel[enemyCont].setText(enemyData[0]);
           enemyWordLabel[enemyCont].setLocation(Integer.parseInt(enemyData[1]), Integer.parseInt(enemyData[2]));
-          enemyWordLabel[enemyCont].setSize(200, 20);
+          enemyWordLabel[enemyCont].setSize(200, 50);
           enemyWordLabel[enemyCont].setForeground(new Color(158, 160, 158));
-          enemyWordLabel[enemyCont].setFont(new Font("Arial", Font.PLAIN, 20));
+          enemyWordLabel[enemyCont].setFont(new Font("Arial", Font.BOLD, 25));
           enemyLifesLabel.setText("Remain lifes: " + enemyData[4]);
           // if (Integer.parseInt(enemyData[4]) == 0) {
           //   lifeThread = 0;

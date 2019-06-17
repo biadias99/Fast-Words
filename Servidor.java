@@ -8,7 +8,7 @@ class Servidor {
     ServerSocket serverSocket = null;
 
     try {
-      serverSocket = new ServerSocket(80);
+      serverSocket = new ServerSocket(8383);
     } catch (IOException e) {
       System.out.println("Could not listen on port: " + 80 + ", " + e);
       System.exit(1);
