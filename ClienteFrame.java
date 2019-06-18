@@ -59,7 +59,7 @@ public class ClienteFrame extends JFrame implements Runnable {
   String inputText;
   String canStart = "PODE COMECAR";
   char teclaDigitada;
-  int speed = 500;
+  int speed = 100;
   String canStartFromServer;
   JLabel waitingEnemy = new JLabel("Waiting enemy...");
   static int lifeThread = 1;
@@ -154,7 +154,7 @@ public class ClienteFrame extends JFrame implements Runnable {
                 wordLabel[i] = new JLabel(word);
                 wordLabel[i].setSize(200, 50);
                 wordLabel[i].setFont(new Font("Arial", Font.BOLD, 25));
-                wordLabel[i].setForeground(new Color(255, 255, 255));
+                wordLabel[i].setForeground(new Color(241, 196, 15));
 
                 centerDiv.add(wordLabel[i]);
 
@@ -164,9 +164,9 @@ public class ClienteFrame extends JFrame implements Runnable {
                 i++;
                 wordsCount++;
                 if (wordsCount % 10 == 0) { // aumenta a velocidade a cada 10 palavras
-                  speed -= 100;
+                  speed -= 20;
                   if (speed <= 0) // entretanto, se for 0, ele deixa padrão 100 pq muito rápido dificulta
-                    speed = 200;
+                    speed = 20;
                 }
                 Thread.sleep(3500); // gera palavra nova na tela a cada 3,5s
               }
@@ -187,7 +187,9 @@ public class ClienteFrame extends JFrame implements Runnable {
         try {
           do {
             while (wordLabel[cont] != null) {
-              pos[cont] += 5;
+              pos[cont] += 1;
+              wordLabel[cont].setLocation(randomXAxis[cont], pos[cont]); // seta a nova posicao +5
+
               // envia para o servidor os dados
               os.println(cliente + " " + wordLabel[cont].getText() + " " + randomXAxis[cont] + " " + pos[cont] + " "
                   + cont + " " + selfLifes);
@@ -208,7 +210,6 @@ public class ClienteFrame extends JFrame implements Runnable {
                 revalidate();
                 repaint();
               } else if (selfLifes != 0 && enemyLifes == 0) {
-                System.out.println("LIFE THREAD == 0, 2\n");
                 lifeThread = 0;
                 centerDiv.removeAll();
 
@@ -223,7 +224,6 @@ public class ClienteFrame extends JFrame implements Runnable {
                 revalidate();
                 repaint();
               } else if (selfLifes == 0 && enemyLifes == 0) {
-                System.out.println("LIFE THREAD == 0, 3\n");
                 lifeThread = 0;
                 centerDiv.removeAll();
 
@@ -239,7 +239,6 @@ public class ClienteFrame extends JFrame implements Runnable {
                 repaint();
               }
 
-              wordLabel[cont].setLocation(randomXAxis[cont], pos[cont]); // seta a nova posicao +5
               if (pos[cont] > 710 && !wordLabel[cont].getText().equals("") && !wordExists(wordLabel[cont].getText())) {
                 // se for maior q 710 o pos, ele perdeu a palavra e perde vida
                 contLostWords++;
@@ -346,7 +345,7 @@ public class ClienteFrame extends JFrame implements Runnable {
           enemyWordLabel[enemyCont].setText(enemyData[0]);
           enemyWordLabel[enemyCont].setLocation(Integer.parseInt(enemyData[1]), Integer.parseInt(enemyData[2]));
           enemyWordLabel[enemyCont].setSize(200, 50);
-          enemyWordLabel[enemyCont].setForeground(new Color(247, 215, 148));
+          enemyWordLabel[enemyCont].setForeground(new Color(236, 240, 241));
           enemyWordLabel[enemyCont].setFont(new Font("Arial", Font.BOLD, 25));
           enemyLifesLabel.setText("Remain lifes: " + enemyData[4]);
           centerDiv.add(enemyWordLabel[enemyCont]); // adiciona palavra do inimigo na tela
